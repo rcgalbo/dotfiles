@@ -60,7 +60,12 @@ PROMPT='%F{green}%n@%m%f:%F{blue}%~%f%F{yellow}${vcs_info_msg_0_}%f$ '
 # =============================================================================
 autoload -U colors && colors
 export CLICOLOR=1
-alias ls='ls --color=auto'
+# macOS uses -G for color, Linux uses --color=auto
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  alias ls='ls -G'
+else
+  alias ls='ls --color=auto'
+fi
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
@@ -107,10 +112,8 @@ alias tns="tmux new-session -t"
 # =============================================================================
 alias code="code-insiders"
 alias condastart="~/miniconda3/bin/conda init zsh"
-alias remove-zone="find . -name '*:Zone.Identifier' -type f -delete"
-alias exp="explorer.exe ."
-alias ag="antigravity ."
-alias claude="$HOME/.claude/local/claude"
+# macOS: open Finder in current directory
+alias exp="open ."
 
 # =============================================================================
 # FUNCTIONS
@@ -127,11 +130,14 @@ claude_engineer() {
 # =============================================================================
 # PATH
 # =============================================================================
-export PATH="/usr/local/cuda/bin:$PATH"
-export PATH="/usr/lib/wsl/lib/:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export FLYCTL_INSTALL="$HOME/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"
+
+# Homebrew (macOS)
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
@@ -191,7 +197,9 @@ export PIPENV_VERBOSITY=-1
 # API KEYS - Source from ~/.secrets
 # =============================================================================
 # Create ~/.secrets with your API keys:
-# export GEMINI_API_KEY=your_key_here
 # export ANTHROPIC_API_KEY=your_key_here
+# export OPENAI_API_KEY=your_key_here
 # etc.
 [ -f ~/.secrets ] && source ~/.secrets
+
+alias claude="$HOME/.local/bin/claude"
